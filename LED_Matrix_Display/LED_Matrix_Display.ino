@@ -1,3 +1,6 @@
+#include <DHT.h>
+#include <DHT_U.h>
+
 /*  Arduino LED Matrix Display - 10x MAX7219 8x8 display-modules   *
  *  Pixels 80x8 - Digital Clock - Thermometer - Ticker             * 
  *  Dev: Michalis Vasilakis - Date: 20/3/17 - Ver. 1.2             * 
