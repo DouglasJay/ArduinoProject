@@ -1,7 +1,7 @@
 /* 
  VCC                      +5V
  DIN                      MOSI (Pin 11)
- LOAD                     pinCS 
+ LOAD                     pinCS  (Pin 10)
  CLK                      SCK (Pin 13)
  GND                      Gnd 
 */
@@ -11,7 +11,7 @@
 #include <Max72xxPanel.h>
 
 int pinCS = 10; 
-int numberOfHorizontalDisplays = 1;
+int numberOfHorizontalDisplays = 4;
 int numberOfVerticalDisplays = 1;
 
 //초음파 센서의 핀번호를 설정
@@ -21,8 +21,8 @@ int trigPin = 9;
 Max72xxPanel matrix = Max72xxPanel(pinCS, numberOfHorizontalDisplays, numberOfVerticalDisplays);
 int scrollspeed = 200; // Default scrollspeed (milliseconds)
 
-int spacer = 1;  // 문자열 사이 스페이스
-int width = 5 + spacer; // The font width is 5 pixels
+int spacer = 1;  // 문자열 사이 공백
+int width = 5 + spacer; // 5 pixels
 boolean inChar = false, NewData = false, pause = false;
 boolean dataAvailable = false;
 char inputString[512];
@@ -32,15 +32,11 @@ int count = 0, BTvalue = 5;
 void setup() {
 
   matrix.setIntensity(1); // 0~15 밝기
-
-// Adjust to your own needs
-  matrix.setPosition(0, 7, 0); // 처음 디스플레이 시작 <0, 7>
-  //matrix.setPosition(1, 6, 0); // 둘째 디스플레이 시작 <1, 0>
-  //matrix.setPosition(2, 5, 0); // 셋째 디스플레이 시작 <2, 0>
-  //matrix.setPosition(3, 4, 0); // 넷째 디스플레이 시작 <3, 0>
-
- //  matrix.setRotation(0, 2);    // 처음 디스플레이 업다운
- //  matrix.setRotation(3, 2);    // 마지막 디스플레이 업다운
+  for (int i = 0; i < numberOfHorizontalDisplays; i++) {
+  matrix.setPosition(i, numberOfHorizontalDisplays-i-1, 0);
+}
+  /*matrix.setRotation(0, 2);    // 처음 디스플레이 업다운
+  //matrix.setRotation(3, 2);    // 마지막 디스플레이 업다운*/
   matrix.fillScreen(0);
   matrix.write();
   Serial.begin(9600);
@@ -65,7 +61,7 @@ void loop(){
   digitalWrite(trigPin, HIGH);
   delay(10);
   digitalWrite(trigPin, LOW);
-  // 초음파를 보낸다. 다 보내면 echo가 HIGH 상태로 대기
+  // 초음파 송신 후 보내지면 echo가 HIGH 상태로 대기
   
   duration = pulseIn(echoPin, HIGH); // echoPin 이 HIGH를 유지한 시간을 저장
   distance = ((float)(340 * duration) / 10000) / 2;  // HIGH 였을 때 시간(초음파가 보냈다가 다시 들어온 시간)을 가지고 거리를 계산
