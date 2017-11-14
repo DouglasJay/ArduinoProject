@@ -9,6 +9,8 @@
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Max72xxPanel.h>
+#include <SoftwareSerial.h>
+#include <LedControl.h>
 
 int pinCS = 10; 
 int numberOfHorizontalDisplays = 4;
@@ -57,7 +59,7 @@ void loop(){
  } 
   float duration;
   int distance;
-  char signal = 'A';
+  char signal[] = "It is too close";
   digitalWrite(trigPin, HIGH);
   delay(10);
   digitalWrite(trigPin, LOW);
@@ -66,11 +68,14 @@ void loop(){
   duration = pulseIn(echoPin, HIGH); // echoPin 이 HIGH를 유지한 시간을 저장
   distance = ((float)(340 * duration) / 10000) / 2;  // HIGH 였을 때 시간(초음파가 보냈다가 다시 들어온 시간)을 가지고 거리를 계산
   
-  if(distance < 10) { //인지한 거리가 10이하로 측정될 경우 signal을 bluetooth통신을 통해 전송
-    Serial.print(signal);
-  }  
-  delay(500);  
- 
+  if(distance < 150) { //인지한 거리가 150cm 이하로 측정될 경우 signal을 bluetooth통신을 통해 전송
+    matrix.fillScreen(HIGH);
+    matrix.write();    
+  } else {
+    matrix.fillScreen(LOW);
+    matrix.write();    
+  }
+  delay(10);   
 }
 
 void display_data(){
@@ -183,19 +188,7 @@ void serialInterrupt(){
             dataAvailable = false;
              break; 
            }
-
-           // '/u' 초음파센서            
-           /*if(ch == 'u'){
-            dataAvailable = false;
-             break; 
-           }*/
-
-           // '/t' 택트스위치           
-           /*if(ch == 't'){
-            dataAvailable = false;
-             break; 
-           }*/
-           
+         
            // '/p' 멈춤           
            if(ch == 'p'){
              if(pause == false){
@@ -220,6 +213,3 @@ void serialInterrupt(){
   }  // while(serial.available)
   inService = false;
 }
-
-
-
